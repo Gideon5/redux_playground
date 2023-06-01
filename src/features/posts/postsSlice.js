@@ -104,7 +104,7 @@ const postsSlice = createSlice ({
         // },
         reactionAdded(state, action) {
             const { postId, reaction } = action.payload
-            const existingPost = state.posts.find(post => post.id === postId)
+            const existingPost = state.entities[postId]
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
@@ -135,7 +135,7 @@ const postsSlice = createSlice ({
                 })
 
                 //Add any fetched posts to the arrray
-                state.posts = state.posts.concat(loadedPosts)
+                postsAdapter.upsertMany(state, action)
             })
             .addCase(fetchPosts.rejected, (state, action) => {
                 state.status = 'failed'
@@ -164,7 +164,7 @@ const postsSlice = createSlice ({
                     coffee: 0
                 }
                 console.log(action.payload)
-                state.posts.push(action.payload)
+                postsAdapter.addOne(state, action.payload)
             })
             .addCase(updatePost.fulfilled, (state, action) => {
                 if (!action.payload?.id) {
